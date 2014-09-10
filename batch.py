@@ -1,10 +1,13 @@
 #!/usr/bin/env python
+#coding:utf8
 import threading
 import time
 import paramiko
 import os,sys
 from optparse import OptionParser
-from sshconfig.cfg.config import host_msg,ip_msg
+from sshconfig.config import host_msg,ip_msg
+
+#选项
 def opts():
     parser = OptionParser(usage="usage %prog options")
     parser.add_option("-i","--item",
@@ -48,7 +51,10 @@ def opts():
                         action="store",
                         )
     return parser.parse_args()
+    
+#执行类
 class Get_date(object):
+    #执行命令函数
     def ssh_cmd(self,number,user,ip,port,cmd):
         for i in xrange(number):
             ssh = paramiko.SSHClient()
@@ -72,6 +78,7 @@ class Get_date(object):
                 #print "\033[33;1m-\033[0m"*120
                 print "-"*120
                 ssh.close()
+    #上传文件函数
     def ssh_file(self,number,user,ip,port,path_ssh_key,sfile,dfile):
         key = paramiko.DSSKey.from_private_key_file(path_ssh_key)
         for i in xrange(number):
@@ -97,6 +104,7 @@ class Get_date(object):
             #print "\033[33;1m-\033[0m"*120
             print "-"*120
             ssh.close()
+    #下载文件函数
     def ssh_down(self,number,user,ip,port,path_ssh_key,sfile,dfile):
         key = paramiko.DSSKey.from_private_key_file(path_ssh_key)
         for i in xrange(number):
@@ -122,18 +130,22 @@ class Get_date(object):
             print "%s:---------->%s\n%s"%(sfile,dfile,ssh_result)
             #print "\033[33;1m-\033[0m"*120
             print "-"*120
+    #多线程函数
     def cmd(self,user,ip,port,cmd):
         for i in xrange(len(ip)):
             a=threading.Thread(target=self.ssh_cmd,args=(1,user,ip[i],port,cmd))
             a.start()
+    #多线程函数
     def dfile(self,user,ip,port,path_ssh_key,sfile,dfile):
         for i in xrange(len(ip)):
             a=threading.Thread(target=self.ssh_down,args=(1,user,ip[i],port,path_ssh_key,sfile,dfile))
             a.start()
+    #多线程函数
     def ufile(self,user,ip,port,path_ssh_key,sfile,dfile):
         for i in xrange(len(ip)):
             a=threading.Thread(target=self.ssh_file,args=(1,user,ip[i],port,path_ssh_key,sfile,dfile))
             a.start()
+#执行主函数
 def main():
     user=host_msg["user"]
     port=host_msg["port"]
